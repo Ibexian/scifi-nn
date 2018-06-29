@@ -1,0 +1,4 @@
+Keras model - of lstm?
+    http://adventuresinmachinelearning.com/keras-lstm-tutorial/
+Save Keras model
+Load into tensorflow.js
