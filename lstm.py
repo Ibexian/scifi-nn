@@ -26,7 +26,7 @@ writer = tf.summary.FileWriter(logs_path)
 training_file = 'moby.txt'
 
 def read_data(fname):
-    punct = re.compile(r'(\.|\,|\?|\--|\)|\()')
+    punct = re.compile(r'(\.|\,|\?|\--|\|)|\(|\!|\;|_)')
     with open(fname) as f:
         content = f.readlines()
     content = [x.strip() for x in content]
@@ -137,6 +137,7 @@ with tf.Session() as session:
             print("Iter= " + str(step+1) + ", Average Loss= " + \
                   "{:.6f}".format(loss_total/display_step) + ", Average Accuracy= " + \
                   "{:.2f}%".format(100*acc_total/display_step))
+            print("{:.2f}% Complete".format(100*(step/training_iters)))
             acc_total = 0
             loss_total = 0
             symbols_in = [training_data[i] for i in range(offset, offset + n_input)]
