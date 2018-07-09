@@ -26,7 +26,7 @@ writer = tf.summary.FileWriter(logs_path)
 training_file = 'moby.txt'
 
 def read_data(fname):
-    punct = re.compile(r'(\.|\,|\?|\--|\|)|\(|\!|\;|_)')
+    punct = re.compile(r'(\.|\,|\?|\--|\|)|\(|\!|\;|\_)')
     with open(fname) as f:
         content = f.readlines()
     content = [x.strip() for x in content]

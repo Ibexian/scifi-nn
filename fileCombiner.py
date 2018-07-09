@@ -13,7 +13,7 @@ combinedTest = open('combined.test.txt', 'w')
 for index, file in enumerate(files):
     f=open(file, 'r')
     print(file)
-    content = f.read().replace('\n', ' ')
+    content = f.read().replace('\n', ' <eos> ')
     print(content)
     if index % 3 == 0:
         combinedTrain.write(content)
