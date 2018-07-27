@@ -50,4 +50,7 @@ http://karpathy.github.io/2015/05/21/rnn-effectiveness/
 
     The ship was a sort of considerable concern to the sea, the ship's company were seated by
 
+### 50 epochs (~65% Categorical Accuracy) - trained on Moby Dick:
+    The master-at-arms ashore has been seen at the main-mast, and the sailors were all the sailors who had been seen at the main-mast
+
 ## Load into tensorflow.js:
