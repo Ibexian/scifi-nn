@@ -2,3 +2,6 @@
 ~
 .DS_Store
 input_data/Sci-Fi Texts
+140 num_steps models/
+scifi_nn_final_model.hdf5
+kerasLSTM/__pycache__
