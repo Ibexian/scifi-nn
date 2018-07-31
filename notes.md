@@ -38,19 +38,27 @@ https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-
 
 http://karpathy.github.io/2015/05/21/rnn-effectiveness/
 
-~1 hr per epoch AND and accuracy above 10%!
+At initial glance this method is much better for my data - it takes about 1 hr per epoch AND and has accuracy almost immediately above 10%!
 
-### 1 epoch - trained on Moby Dick as an example:
-    tn thore, t shought t hauld heyl fbout t sittle abd see the sater
-    cart of the sarld, Inws a ser o have nntaeaving tff toe shieen tnd semu
+## Proof of Concept trained on the writings of Melville:
 
-### 26 epochs (~60% Categorical Accuracy) - trained on Moby Dick:
+### 1 epoch:
+    the stranger of the sailors of the sailors of the sailors of the stranger of the stranger of the stranger of the stranger of the stranger of
+
+### 26 epochs (~60% Categorical Accuracy):
     THE COMMODORE OF THE STRANGER IN A MAN-OF-WAR.
 
 
     The ship was a sort of considerable concern to the sea, the ship's company were seated by
 
-### 50 epochs (~65% Categorical Accuracy) - trained on Moby Dick:
+### 50 epochs (~65% Categorical Accuracy):
     The master-at-arms ashore has been seen at the main-mast, and the sailors were all the sailors who had been seen at the main-mast
+
+### 61 has the highest categorical accuracy so far (as of epoch 100) -> 65.41%
+
+    is the Captain of the officers of the Purser's Steward as a common sailor, and the sailors were set forth in the ship's boat, and the same strange strict and solemn of the sea and the same strange strip of a strange sort of state as the same strange strip of state as the ship is almost a sort of strange dog the same thing to be a sort of state of sea-waters
+
+## Begin Training on Sci-fi Data - Target Accuracy ~65%
+The training data for the Melvile works above was about 3.5Mb and each epoch took about 50 min. The sci-fi data is considerably bigger - 12.7Mb (which is reduced from the originaly planned 40mb) so each epoch takes about 4 hours.
 
 ## Load into tensorflow.js:

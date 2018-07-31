@@ -119,12 +119,13 @@ model = Sequential()
 model.add(Embedding(vocabulary, hidden_size, input_length=num_steps))
 model.add(LSTM(hidden_size, return_sequences=True))
 model.add(LSTM(hidden_size, return_sequences=True))
+model.add(LSTM(hidden_size, return_sequences=True))
 if use_dropout:
     model.add(Dropout(0.5))
 model.add(TimeDistributed(Dense(vocabulary)))
-model.add(Activation('softmax'))
+model.add(Activation('relu'))
 
-model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['categorical_accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['categorical_accuracy'])
 
 print(model.summary())
 checkpointer = ModelCheckpoint(filepath=data_path + '/model-{epoch:02d}.hdf5', verbose=1)
@@ -145,7 +146,7 @@ elif args.run_opt == "continue":
 
     model.save(data_path + "final_model.hdf5")
 elif args.run_opt == "generate":
-    model = load_model(data_path + "model-49.hdf5")
+    model = load_model(data_path + "model-100.hdf5")
     dummy_iters = 20
     example_training_generator = KerasBatchGenerator(train_data, num_steps, 1, vocabulary, skip_step=1)
     print("Training Data:")
