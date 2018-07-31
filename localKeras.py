@@ -66,9 +66,9 @@ def generate_text(model, input_length, output_length, vocab_size, reversed_dicti
     return('').join(y_char)
 
 def load_data():
-    train_path = os.path.join(data_path, "input_data/moby.train.txt")
-    valid_path = os.path.join(data_path, "input_data/moby.valid.txt")
-    test_path = os.path.join(data_path, "input_data/moby.test.txt")
+    train_path = os.path.join(data_path, "input_data/combined.train.txt")
+    valid_path = os.path.join(data_path, "input_data/combined.valid.txt")
+    test_path = os.path.join(data_path, "input_data/combined.test.txt")
 
     #build the vocab
     char_to_id = build_vocab(train_path)
@@ -146,7 +146,7 @@ elif args.run_opt == "continue":
 
     model.save(data_path + "final_model.hdf5")
 elif args.run_opt == "generate":
-    model = load_model(data_path + "model-100.hdf5")
+    model = load_model(data_path + "model-61.hdf5")
     dummy_iters = 20
     example_training_generator = KerasBatchGenerator(train_data, num_steps, 1, vocabulary, skip_step=1)
     print("Training Data:")
