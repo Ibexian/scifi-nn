@@ -2,6 +2,7 @@
 ~
 .DS_Store
 input_data/Sci-Fi Texts
-140 num_steps models/
+melville models/
 scifi_nn_final_model.hdf5
 kerasLSTM/__pycache__
+model-*.hdf5

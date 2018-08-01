@@ -146,7 +146,7 @@ elif args.run_opt == "continue":
 
     model.save(data_path + "final_model.hdf5")
 elif args.run_opt == "generate":
-    model = load_model(data_path + "model-61.hdf5")
+    model = load_model(data_path + "model-02.hdf5")
     dummy_iters = 20
     example_training_generator = KerasBatchGenerator(train_data, num_steps, 1, vocabulary, skip_step=1)
     print("Training Data:")
