@@ -66,21 +66,19 @@ def generate_text(model, input_length, output_length, vocab_size, reversed_dicti
     return('').join(y_char)
 
 def load_data():
-    train_path = os.path.join(data_path, "input_data/combined.train.txt")
-    valid_path = os.path.join(data_path, "input_data/combined.valid.txt")
-    test_path = os.path.join(data_path, "input_data/combined.test.txt")
+    train_path = os.path.join(data_path, "input_data/log.train.txt")
+    valid_path = os.path.join(data_path, "input_data/log.valid.txt")
 
     #build the vocab
     char_to_id = build_vocab(train_path)
     train_data = file_to_char_ids(train_path, char_to_id)
     valid_data = file_to_char_ids(valid_path, char_to_id)
-    test_data = file_to_char_ids(test_path, char_to_id)
     vocabulary = len(char_to_id)
     reversed_dictionary = dict(zip(char_to_id.values(), char_to_id.keys()))
 
-    return train_data, valid_data, test_data, vocabulary, reversed_dictionary
+    return train_data, valid_data, vocabulary, reversed_dictionary
 
-train_data, valid_data, test_data, vocabulary, reversed_dictionary = load_data()
+train_data, valid_data, vocabulary, reversed_dictionary = load_data()
 #batch process for input data
 class KerasBatchGenerator(object):
 
@@ -112,7 +110,7 @@ batch_size = 30 #20
 train_data_generator = KerasBatchGenerator(train_data, num_steps, batch_size, vocabulary, skip_step=num_steps)
 valid_data_generator = KerasBatchGenerator(valid_data, num_steps, batch_size, vocabulary, skip_step=num_steps)
 
-hidden_size = 500
+hidden_size = 700
 use_dropout = True
 # Build the network using sequential
 model = Sequential()
@@ -121,7 +119,7 @@ model.add(LSTM(hidden_size, return_sequences=True))
 model.add(LSTM(hidden_size, return_sequences=True))
 model.add(LSTM(hidden_size, return_sequences=True))
 if use_dropout:
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.3))
 model.add(TimeDistributed(Dense(vocabulary)))
 model.add(Activation('relu'))
 
@@ -146,7 +144,7 @@ elif args.run_opt == "continue":
 
     model.save(data_path + "final_model.hdf5")
 elif args.run_opt == "generate":
-    model = load_model(data_path + "model-02.hdf5")
+    model = load_model(data_path + "model-03.hdf5")
     dummy_iters = 20
     example_training_generator = KerasBatchGenerator(train_data, num_steps, 1, vocabulary, skip_step=1)
     print("Training Data:")
@@ -168,3 +166,4 @@ elif args.run_opt == "generate":
         num_predict = gen_length
     print("Generated Text: ")
     generate_text(model, num_steps, num_predict, vocabulary, reversed_dictionary)
+    print("")

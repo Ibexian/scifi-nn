@@ -18,9 +18,10 @@ https://towardsdatascience.com/lstm-by-example-using-tensorflow-feb0c1968537
 
 http://adventuresinmachinelearning.com/keras-lstm-tutorial/
 
-80 hrs to train one epoch... yikes
+Epochs are a single pass over the data set - the bigger the data set the longer a single epoch takes. So, with my initial data set of 40MB - a single epoch takes 80 hours on a CPU - so let's try using a few gpus.
 
 ## Keras on Google Cloud:
+Since I didn't actually have access to a few GPUs - I turned to the cloud. Luckily I still had money left on my Google Cloud free trial. So let's find a guide to using Keras on the cloud.
 
 http://liufuyang.github.io/2017/04/02/just-another-tensorflow-beginner-guide-4.html
 
@@ -60,5 +61,10 @@ At initial glance this method is much better for my data - it takes about 1 hr p
 
 ## Begin Training on Sci-fi Data - Target Accuracy ~65%
 The training data for the Melvile works above was about 3.5Mb and each epoch took about 50 min. The sci-fi data is considerably bigger - 12.7Mb (which is reduced from the originaly planned 40mb) so each epoch takes about 4 hours.
+
+## 2 Epochs:
+    te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te te
+
+
 
 ## Load into tensorflow.js:
