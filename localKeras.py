@@ -66,8 +66,8 @@ def generate_text(model, input_length, output_length, vocab_size, reversed_dicti
     return('').join(y_char)
 
 def load_data():
-    train_path = os.path.join(data_path, "input_data/log.train.txt")
-    valid_path = os.path.join(data_path, "input_data/log.valid.txt")
+    train_path = os.path.join(data_path, "input_data/combined.train.txt")
+    valid_path = os.path.join(data_path, "input_data/combined.valid.txt")
 
     #build the vocab
     char_to_id = build_vocab(train_path)

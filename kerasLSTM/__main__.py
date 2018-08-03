@@ -40,8 +40,8 @@ def file_to_char_ids(filename, char_to_id):
     return [char_to_id[char] for char in data if char in char_to_id]
 
 def load_data():
-    train_path = os.path.join(data_path, "log.train.txt")
-    valid_path = os.path.join(data_path, "log.valid.txt")
+    train_path = os.path.join(data_path, "combined.train.txt")
+    valid_path = os.path.join(data_path, "combined.valid.txt")
 
     #build the vocab
     char_to_id = build_vocab(train_path)
