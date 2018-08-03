@@ -4,6 +4,14 @@ import collections
 import os
 import numpy as np
 import tensorflow as tf
+import re
+import glob
+
+def get_current_model():
+    currentModel = max(glob.glob(data_path + 'model-[0-9]*.hdf5'))
+    currentModelNumber = int(re.search(r"model-(\d*)", currentModel).group(1))
+    print(currentModelNumber)
+    return currentModel, currentModelNumber
 
 def read_chars(filename):
     data = open(filename, "r").read()

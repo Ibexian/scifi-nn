@@ -3,7 +3,6 @@ import collections
 import os
 import numpy as np
 import tensorflow as tf
-import re
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Activation, Embedding, Flatten, Dropout, TimeDistributed, Reshape, Lambda
 from keras.layers import LSTM
@@ -15,7 +14,6 @@ from keras.layers.normalization import BatchNormalization
 from data_utils import *
 import argparse
 import pdb
-import glob
 
 data_path = "/Users/wkamovitch/Sites/scifinn/"
 
@@ -84,16 +82,15 @@ if args.run_opt == "train":
 
     model.save(data_path + "final_model.hdf5")
 elif args.run_opt == "continue":
-    currentModel = max(glob.glob(data_path + 'model-[0-9]*.hdf5'))
-    currentModelNumber = int(re.search(r"model-(\d*)", currentModel).group(1))
-    print(currentModelNumber)
+    currentModel, currentModelNumber = get_current_model()
     model = load_model(currentModel)
     model.fit_generator(train_data_generator.generate(), len(train_data)//(batch_size*num_steps), num_epochs, \
         validation_data=valid_data_generator.generate(), validation_steps=len(valid_data)//(batch_size * num_steps), callbacks=[checkpointer], initial_epoch=currentModelNumber)
 
     model.save(data_path + "final_model.hdf5")
 elif args.run_opt == "test":
-    model = load_model(data_path + "model-03.hdf5")
+    currentModel, _ = get_current_model()
+    model = load_model(currentModel)
     dummy_iters = 20
     example_training_generator = KerasBatchGenerator(train_data, num_steps, 1, vocabulary, skip_step=1)
     print("Training Data:")
@@ -110,4 +107,3 @@ elif args.run_opt == "test":
         pred_print_out += reversed_dictionary[predict_word] + ""
     print(true_print_out)
     print(pred_print_out)
-    # Test text generation
