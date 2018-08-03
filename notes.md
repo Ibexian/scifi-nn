@@ -1,4 +1,6 @@
 # Sci-fi NN
+http://colah.github.io/posts/2014-07-NLP-RNNs-Representations/
+
 ## Get the data:
 
 Project Gutenberg Science Fiction CD

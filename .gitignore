@@ -1,8 +1,7 @@
 .vscode
+__pycache__
 ~
 .DS_Store
 input_data/Sci-Fi Texts
-melville models/
 scifi_nn_final_model.hdf5
-kerasLSTM/__pycache__
 model-*.hdf5

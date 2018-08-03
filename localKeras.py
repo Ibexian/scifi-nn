@@ -12,6 +12,7 @@ from keras import backend as K
 from keras.utils import to_categorical
 from keras.callbacks import ModelCheckpoint
 from keras.layers.normalization import BatchNormalization
+from data_utils import *
 import argparse
 import pdb
 import glob
@@ -21,64 +22,12 @@ data_path = "/Users/wkamovitch/Sites/scifinn/"
 parser = argparse.ArgumentParser()
 parser.add_argument('run_opt', type=str, default="train", help='Mode to start the keras model with')
 parser.add_argument('--data_path', type=str, default=data_path, help='The full path of the training data')
-parser.add_argument('--gen_length', type=int, default=140, help='Length of generated output')
 args = parser.parse_args()
 
 if args.data_path:
     data_path = args.data_path
 
-if args.gen_length:
-    gen_length = args.gen_length
-
-def read_chars(filename):
-    data = open(filename, "r").read()
-    chars = list(set(data))
-    return data, chars
-
-def build_vocab(filename):
-    data, _ = read_chars(filename)
-
-    counter = collections.Counter(data)
-    count_pairs = sorted(counter.items(), key=lambda x: (-x[1], x[0]))
-
-    chars, _ = list(zip(*count_pairs))
-    char_to_id = dict(zip(chars, range(len(chars))))
-
-    return char_to_id
-
-def file_to_char_ids(filename, char_to_id):
-    data, _ = read_chars(filename)
-    return [char_to_id[char] for char in data if char in char_to_id]
-
-def generate_text(model, input_length, output_length, vocab_size, reversed_dictionary):
-    y_char = []
-    X = np.random.random_integers(low=0, high=vocab_size - 1, size=(1, input_length))
-    for i in range(output_length):
-        # Make a prediction
-        prediction = model.predict(X)
-        ix = np.argmax(prediction[:, input_length - 1, :])
-        # Assign that prediction as the last val in X
-        X[0][0] = ix
-        X = np.roll(X, -1, axis=1)
-        # Add Predition to output
-        print(reversed_dictionary[ix], end="")
-        y_char.append(reversed_dictionary[ix])
-    return('').join(y_char)
-
-def load_data():
-    train_path = os.path.join(data_path, "input_data/combined.train.txt")
-    valid_path = os.path.join(data_path, "input_data/combined.valid.txt")
-
-    #build the vocab
-    char_to_id = build_vocab(train_path)
-    train_data = file_to_char_ids(train_path, char_to_id)
-    valid_data = file_to_char_ids(valid_path, char_to_id)
-    vocabulary = len(char_to_id)
-    reversed_dictionary = dict(zip(char_to_id.values(), char_to_id.keys()))
-
-    return train_data, valid_data, vocabulary, reversed_dictionary
-
-train_data, valid_data, vocabulary, reversed_dictionary = load_data()
+train_data, valid_data, vocabulary, reversed_dictionary = load_data(data_path)
 #batch process for input data
 class KerasBatchGenerator(object):
 
@@ -110,7 +59,7 @@ batch_size = 30 #20
 train_data_generator = KerasBatchGenerator(train_data, num_steps, batch_size, vocabulary, skip_step=num_steps)
 valid_data_generator = KerasBatchGenerator(valid_data, num_steps, batch_size, vocabulary, skip_step=num_steps)
 
-hidden_size = 700
+hidden_size = 500 # Maybe switch to 700
 use_dropout = True
 # Build the network using sequential
 model = Sequential()
@@ -143,7 +92,7 @@ elif args.run_opt == "continue":
         validation_data=valid_data_generator.generate(), validation_steps=len(valid_data)//(batch_size * num_steps), callbacks=[checkpointer], initial_epoch=currentModelNumber)
 
     model.save(data_path + "final_model.hdf5")
-elif args.run_opt == "generate":
+elif args.run_opt == "test":
     model = load_model(data_path + "model-03.hdf5")
     dummy_iters = 20
     example_training_generator = KerasBatchGenerator(train_data, num_steps, 1, vocabulary, skip_step=1)
@@ -162,8 +111,3 @@ elif args.run_opt == "generate":
     print(true_print_out)
     print(pred_print_out)
     # Test text generation
-    if gen_length:
-        num_predict = gen_length
-    print("Generated Text: ")
-    generate_text(model, num_steps, num_predict, vocabulary, reversed_dictionary)
-    print("")
