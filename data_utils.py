@@ -7,9 +7,10 @@ import tensorflow as tf
 import re
 import glob
 
-def get_current_model():
+def get_current_model(data_path):
     currentModel = max(glob.glob(data_path + 'model-[0-9]*.hdf5'))
     currentModelNumber = int(re.search(r"model-(\d*)", currentModel).group(1))
+    print("Loading Model ", end="")
     print(currentModelNumber)
     return currentModel, currentModelNumber
 
@@ -44,4 +45,4 @@ def load_data(data_path):
     vocabulary = len(char_to_id)
     reversed_dictionary = dict(zip(char_to_id.values(), char_to_id.keys()))
 
-    return train_data, valid_data, vocabulary, reversed_dictionary
+    return train_data, valid_data, vocabulary, reversed_dictionary, char_to_id

@@ -5,12 +5,11 @@ import numpy as np
 import tensorflow as tf
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Activation, Embedding, Flatten, Dropout, TimeDistributed, Reshape, Lambda
-from keras.layers import LSTM
-from keras.optimizers import RMSprop, Adam, SGD
+from keras.layers import LSTM, BatchNormalization
+from keras.optimizers import RMSprop, Adam, SGD, Adamax
 from keras import backend as K
 from keras.utils import to_categorical
-from keras.callbacks import ModelCheckpoint
-from keras.layers.normalization import BatchNormalization
+from keras.callbacks import ModelCheckpoint, TerminateOnNaN
 from data_utils import *
 import argparse
 import pdb
@@ -25,7 +24,7 @@ args = parser.parse_args()
 if args.data_path:
     data_path = args.data_path
 
-train_data, valid_data, vocabulary, reversed_dictionary = load_data(data_path)
+train_data, valid_data, vocabulary, reversed_dictionary, _ = load_data(data_path)
 #batch process for input data
 class KerasBatchGenerator(object):
 
@@ -52,8 +51,8 @@ class KerasBatchGenerator(object):
                 self.current_idx += self.skip_step
             yield x, y
 
-num_steps = 140 #30
-batch_size = 30 #20
+num_steps = 50 #30
+batch_size = 128 #20
 train_data_generator = KerasBatchGenerator(train_data, num_steps, batch_size, vocabulary, skip_step=num_steps)
 valid_data_generator = KerasBatchGenerator(valid_data, num_steps, batch_size, vocabulary, skip_step=num_steps)
 
@@ -62,34 +61,39 @@ use_dropout = True
 # Build the network using sequential
 model = Sequential()
 model.add(Embedding(vocabulary, hidden_size, input_length=num_steps))
-model.add(LSTM(hidden_size, return_sequences=True))
-model.add(LSTM(hidden_size, return_sequences=True))
-model.add(LSTM(hidden_size, return_sequences=True))
+model.add(LSTM(hidden_size, return_sequences=True, activation='relu'))
+model.add(LSTM(hidden_size, return_sequences=True, activation='relu'))
+model.add(LSTM(hidden_size, return_sequences=True, activation='relu'))
+model.add(BatchNormalization())
 if use_dropout:
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.5))
 model.add(TimeDistributed(Dense(vocabulary)))
-model.add(Activation('relu'))
+model.add(Activation('softmax'))
 
-model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['categorical_accuracy'])
-
+model.compile(loss='categorical_crossentropy', optimizer=Adamax(lr=0.002, beta_1=0.9, beta_2=0.999), metrics=['categorical_accuracy'])
 print(model.summary())
 checkpointer = ModelCheckpoint(filepath=data_path + '/model-{epoch:02d}.hdf5', verbose=1)
 num_epochs = 200
 
 if args.run_opt == "train":
     model.fit_generator(train_data_generator.generate(), len(train_data)//(batch_size*num_steps), num_epochs, \
-        validation_data=valid_data_generator.generate(), validation_steps=len(valid_data)//(batch_size * num_steps), callbacks=[checkpointer])
+        validation_data=valid_data_generator.generate(), validation_steps=len(valid_data)//(batch_size * num_steps), callbacks=[checkpointer, TerminateOnNaN()])
 
     model.save(data_path + "final_model.hdf5")
 elif args.run_opt == "continue":
-    currentModel, currentModelNumber = get_current_model()
+    currentModel, currentModelNumber = get_current_model(data_path)
     model = load_model(currentModel)
+    batch_size = batch_size + (currentModelNumber * 20)
+    print("Learning Rate: ", end="")
+    print(K.eval(model.optimizer.lr))
+    print("Batch Size: ", end="")
+    print(batch_size)
     model.fit_generator(train_data_generator.generate(), len(train_data)//(batch_size*num_steps), num_epochs, \
-        validation_data=valid_data_generator.generate(), validation_steps=len(valid_data)//(batch_size * num_steps), callbacks=[checkpointer], initial_epoch=currentModelNumber)
+        validation_data=valid_data_generator.generate(), validation_steps=len(valid_data)//(batch_size * num_steps), callbacks=[checkpointer, TerminateOnNaN()], initial_epoch=currentModelNumber)
 
     model.save(data_path + "final_model.hdf5")
 elif args.run_opt == "test":
-    currentModel, _ = get_current_model()
+    currentModel, _ = get_current_model(data_path)
     model = load_model(currentModel)
     dummy_iters = 20
     example_training_generator = KerasBatchGenerator(train_data, num_steps, 1, vocabulary, skip_step=1)
