@@ -1,4 +1,4 @@
-from data_utils import *
+from data_utils import load_data
 from keras.models import load_model
 import numpy as np
 import argparse

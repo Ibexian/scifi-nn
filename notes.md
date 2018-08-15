@@ -14,19 +14,35 @@ For the final bit of data manipulation I wanted to combine the separate works in
 
 With our three training files ready to go (you can see the training file [here](input_data/combined.train.txt)) - we could now move on to the actual model creation work.
 
-## LSTM: 
+## Long Short-Term Memory (LSTM): 
+To begin, I knew I wanted to use an LSTM RNN to build my text generator model - they're ['unreasonably effective'](http://karpathy.github.io/2015/05/21/rnn-effectiveness/), especially when it comes to language processing.
 
-https://towardsdatascience.com/lstm-by-example-using-tensorflow-feb0c1968537
+So where better to begin than with a [basic tensorflow example tutorial](https://towardsdatascience.com/lstm-by-example-using-tensorflow-feb0c1968537) that reviews each word in the sample data in order to predict the next word in a series.
 
-### 6 hrs of training and ...
+After following the tutorial I came up with this version: [`lstm.py`](previous_versions/lstm.py)
+
+
+_Throughout this work I used the [collected works of Herman Melville](input_data/moby.train.txt) as a proof of concept data set - it's large enough to cause some difficulty without being the insane 40MB of my collected Sci-fi data set._
+### 6 hours of training and ...
 
     all the things of I I Bartleby, I I Bartleby, I I Bartleby, I I Bartleby, I I Bartleby, I I Bartleby,
 
-## Switch to Keras:
+Ok, so that's not the masterpiece I was hoping for, but it is doing _something_. Which is a start.
 
-http://adventuresinmachinelearning.com/keras-lstm-tutorial/
+I wanted to be able to save all this glorious progress, so I added the ability to save to `lstm.py `. I turns out, however, that saved Tensorflow models are less useful than I'd hoped - **they can't be loaded into tensorflow.js**. So a new plan was needed.
+## Switching to Keras:
 
-Epochs are a single pass over the data set - the bigger the data set the longer a single epoch takes. So, with my initial data set of 40MB - a single epoch takes 80 hours on a CPU - so let's try using a few gpus.
+Unlike barebones Tensorflow - Keras has some built in model saving methods that can be used to for tensorflow.js once the model is fully trained. Additionally Keras is stacked with a ton of syntactic sugar to make the code for model training clearer and easier.
+
+Yet again we started [with a tutorial](http://adventuresinmachinelearning.com/keras-lstm-tutorial/).
+
+This tutorial resulted in the barebones of what became my current modeling code ([localKeras.py](localKeras.py)). It also introduced me to a new method of training on a single data set: Epochs.
+
+Epochs are a single pass over the data set - the bigger the data set the longer a single epoch takes - with the expectation that a model can be trained repeatedly over the same data to get better results. So, whereas my initial LSTM training took 6 hours to train - we can now get better results by training for much much longer.
+
+As you may guess - this also presents us with a new problem - if the 'resonably sized' data set took 6 hours for one epoch and the sci-fi data set is 10 times bigger - **a single epoch of sci-fi data would take 60 hours on a CPU**.
+
+So let's try using a few GPUs.
 
 ## Keras on Google Cloud:
 Since I didn't actually have access to a few GPUs - I turned to the cloud. Luckily I still had money left on my Google Cloud free trial. So let's find a guide to using Keras on the cloud.
@@ -42,7 +58,7 @@ tensorflow version - want 1.8 not 1.0 (which is default)
 
 So, I'd likely need to train it much much longer ~ 50 epochs but I don't have 500 free gpu hours on Google Cloud nor the equivalent $200 to spare, so we need another option
 
-## Char based Keras:
+## Character Based Keras:
 https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-Recurrent-Neural-Network/
 
 http://karpathy.github.io/2015/05/21/rnn-effectiveness/
@@ -85,6 +101,33 @@ It seems the NaN issue is some combination of the learning rate, the batch size,
 ### 10 Epochs (~62% Categorical Accuracy):
     "Well, there is a strange thing to the stars, and the cadets were all right. The cadets were all right, and the cadets were all right
 
+### 40 Epochs (63.7% Accurate):
+    "Well, then, sir," said Tom. "I was a spaceman in the stars and the stars which was the same thing to the stars and the stars were all right
+Seeded with "It all began with" :
 
+    It all began with a smile. "We're all right, but I don't know what they were doing about it."
+
+    "What about the same thing is the matter with the stars and 
+
+### 101 Epochs (65.2% Accurate):
+    Wicked Statisticalist Party, and the statement of the colonists were allowed to see the stars and the stars were allowed to see the stars 
+
+### 121 Epochs (66.4%):
+    The only thing that happened to be a man of the Solar System. It was a strange thing that the sun was still there. The sun was still stretching.
 
 ## Load into tensorflow.js:
+Once I had a model I was fairly satisfied with It was time to move on to phase two - turning this awful machine learning model into an awful web app. Thanks to Keras - the model I had trained was readily convertable to JSON for use with tensorflow.js.
+
+```bash
+pip install tensorflowjs
+tensorflowjs_converter --input_format keras \
+                       path/to/my_model.hdf5 \
+                       path/to/tfjs_target_dir
+```
+This makes a `model.json` as well as several shard files of the weights (e.g. `group1-shard1of6`).
+
+To load these into JS you only need to import Tensorflow.js and the `model.json`.
+```javascript
+import * as tf from '@tensorflow/tfjs';
+const model = await tf.loadModel('model.json');
+```

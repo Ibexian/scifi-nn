@@ -10,7 +10,7 @@ from keras.optimizers import RMSprop, Adam, SGD, Adamax
 from keras import backend as K
 from keras.utils import to_categorical
 from keras.callbacks import ModelCheckpoint, TerminateOnNaN
-from data_utils import *
+from data_utils import get_current_model, load_data
 import argparse
 import pdb
 
@@ -83,7 +83,8 @@ if args.run_opt == "train":
 elif args.run_opt == "continue":
     currentModel, currentModelNumber = get_current_model(data_path)
     model = load_model(currentModel)
-    batch_size = batch_size + (currentModelNumber * 20)
+    batch_size = batch_size + (currentModelNumber * 5) #Assign a new batch size when continuing training (this only fires when starting/restarting the training)
+    checkpointer = ModelCheckpoint(filepath=data_path + '/model-{epoch:02d}.hdf5', verbose=1, monitor='categorical_accuracy', save_best_only=True, mode='auto')
     print("Learning Rate: ", end="")
     print(K.eval(model.optimizer.lr))
     print("Batch Size: ", end="")
