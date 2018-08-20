@@ -1,1 +1,319 @@
-{"weightsManifest": [{"weights": [{"shape": [500], "dtype": "float32", "name": "batch_normalization_1_1/gamma"}, {"shape": [500], "dtype": "float32", "name": "batch_normalization_1_1/beta"}, {"shape": [500], "dtype": "float32", "name": "batch_normalization_1_1/moving_mean"}, {"shape": [500], "dtype": "float32", "name": "batch_normalization_1_1/moving_variance"}, {"shape": [95, 500], "dtype": "float32", "name": "embedding_1_1/embeddings"}, {"shape": [500, 2000], "dtype": "float32", "name": "lstm_1_1/kernel"}, {"shape": [500, 2000], "dtype": "float32", "name": "lstm_1_1/recurrent_kernel"}, {"shape": [2000], "dtype": "float32", "name": "lstm_1_1/bias"}, {"shape": [500, 2000], "dtype": "float32", "name": "lstm_2_1/kernel"}, {"shape": [500, 2000], "dtype": "float32", "name": "lstm_2_1/recurrent_kernel"}, {"shape": [2000], "dtype": "float32", "name": "lstm_2_1/bias"}, {"shape": [500, 2000], "dtype": "float32", "name": "lstm_3_1/kernel"}, {"shape": [500, 2000], "dtype": "float32", "name": "lstm_3_1/recurrent_kernel"}, {"shape": [2000], "dtype": "float32", "name": "lstm_3_1/bias"}, {"shape": [500, 95], "dtype": "float32", "name": "time_distributed_1_1/kernel"}, {"shape": [95], "dtype": "float32", "name": "time_distributed_1_1/bias"}], "paths": ["group1-shard1of6", "group1-shard2of6", "group1-shard3of6", "group1-shard4of6", "group1-shard5of6", "group1-shard6of6"]}], "modelTopology": {"training_config": {"sample_weight_mode": null, "metrics": ["categorical_accuracy"], "optimizer_config": {"class_name": "SGD", "config": {"lr": 0.003000000026077032, "decay": 0.0, "nesterov": false, "momentum": 3.000000106112566e-06}}, "loss": "categorical_crossentropy", "loss_weights": null}, "keras_version": "2.1.6", "backend": "tensorflow", "model_config": {"class_name": "Sequential", "config": [{"class_name": "Embedding", "config": {"input_length": 50, "embeddings_regularizer": null, "trainable": true, "dtype": "float32", "embeddings_constraint": null, "output_dim": 500, "mask_zero": false, "batch_input_shape": [null, 50], "activity_regularizer": null, "input_dim": 95, "name": "embedding_1", "embeddings_initializer": {"class_name": "RandomUniform", "config": {"seed": null, "minval": -0.05, "maxval": 0.05}}}}, {"class_name": "LSTM", "config": {"kernel_constraint": null, "implementation": 1, "activation": "relu", "recurrent_initializer": {"class_name": "Orthogonal", "config": {"seed": null, "gain": 1.0}}, "unit_forget_bias": true, "kernel_initializer": {"class_name": "VarianceScaling", "config": {"seed": null, "scale": 1.0, "distribution": "uniform", "mode": "fan_avg"}}, "go_backwards": false, "use_bias": true, "bias_initializer": {"class_name": "Zeros", "config": {}}, "trainable": true, "kernel_regularizer": null, "bias_constraint": null, "recurrent_activation": "hard_sigmoid", "recurrent_regularizer": null, "return_state": false, "dropout": 0.0, "stateful": false, "recurrent_constraint": null, "activity_regularizer": null, "unroll": false, "return_sequences": true, "recurrent_dropout": 0.0, "bias_regularizer": null, "name": "lstm_1", "units": 500}}, {"class_name": "LSTM", "config": {"kernel_constraint": null, "implementation": 1, "activation": "relu", "recurrent_initializer": {"class_name": "Orthogonal", "config": {"seed": null, "gain": 1.0}}, "unit_forget_bias": true, "kernel_initializer": {"class_name": "VarianceScaling", "config": {"seed": null, "scale": 1.0, "distribution": "uniform", "mode": "fan_avg"}}, "go_backwards": false, "use_bias": true, "bias_initializer": {"class_name": "Zeros", "config": {}}, "trainable": true, "kernel_regularizer": null, "bias_constraint": null, "recurrent_activation": "hard_sigmoid", "recurrent_regularizer": null, "return_state": false, "dropout": 0.0, "stateful": false, "recurrent_constraint": null, "activity_regularizer": null, "unroll": false, "return_sequences": true, "recurrent_dropout": 0.0, "bias_regularizer": null, "name": "lstm_2", "units": 500}}, {"class_name": "LSTM", "config": {"kernel_constraint": null, "implementation": 1, "activation": "relu", "recurrent_initializer": {"class_name": "Orthogonal", "config": {"seed": null, "gain": 1.0}}, "unit_forget_bias": true, "kernel_initializer": {"class_name": "VarianceScaling", "config": {"seed": null, "scale": 1.0, "distribution": "uniform", "mode": "fan_avg"}}, "go_backwards": false, "use_bias": true, "bias_initializer": {"class_name": "Zeros", "config": {}}, "trainable": true, "kernel_regularizer": null, "bias_constraint": null, "recurrent_activation": "hard_sigmoid", "recurrent_regularizer": null, "return_state": false, "dropout": 0.0, "stateful": false, "recurrent_constraint": null, "activity_regularizer": null, "unroll": false, "return_sequences": true, "recurrent_dropout": 0.0, "bias_regularizer": null, "name": "lstm_3", "units": 500}}, {"class_name": "BatchNormalization", "config": {"gamma_initializer": {"class_name": "Ones", "config": {}}, "beta_regularizer": null, "scale": true, "epsilon": 0.001, "gamma_constraint": null, "axis": -1, "beta_constraint": null, "beta_initializer": {"class_name": "Zeros", "config": {}}, "gamma_regularizer": null, "momentum": 0.99, "center": true, "trainable": true, "moving_variance_initializer": {"class_name": "Ones", "config": {}}, "moving_mean_initializer": {"class_name": "Zeros", "config": {}}, "name": "batch_normalization_1"}}, {"class_name": "Dropout", "config": {"seed": null, "rate": 0.5, "noise_shape": null, "name": "dropout_1", "trainable": true}}, {"class_name": "TimeDistributed", "config": {"layer": {"class_name": "Dense", "config": {"kernel_constraint": null, "activation": "linear", "kernel_initializer": {"class_name": "VarianceScaling", "config": {"seed": null, "scale": 1.0, "distribution": "uniform", "mode": "fan_avg"}}, "use_bias": true, "bias_initializer": {"class_name": "Zeros", "config": {}}, "trainable": true, "activity_regularizer": null, "kernel_regularizer": null, "bias_regularizer": null, "bias_constraint": null, "name": "dense_1", "units": 95}}, "name": "time_distributed_1", "trainable": true}}, {"class_name": "Activation", "config": {"activation": "softmax", "name": "activation_1", "trainable": true}}]}}}
+{
+    "modelTopology": {
+        "keras_version": "2.1.6",
+        "backend": "tensorflow",
+        "training_config": {
+            "optimizer_config": {
+                "config": {
+                    "decay": 0.0,
+                    "momentum": 3.000000106112566e-06,
+                    "lr": 0.003000000026077032,
+                    "nesterov": false
+                },
+                "class_name": "SGD"
+            },
+            "metrics": ["categorical_accuracy"],
+            "loss": "categorical_crossentropy",
+            "sample_weight_mode": null,
+            "loss_weights": null
+        },
+        "model_config": {
+            "config": [{
+                "config": {
+                    "output_dim": 500,
+                    "batch_input_shape": [null, 50],
+                    "embeddings_initializer": {
+                        "config": {
+                            "maxval": 0.05,
+                            "minval": -0.05,
+                            "seed": null
+                        },
+                        "class_name": "RandomUniform"
+                    },
+                    "dtype": "float32",
+                    "input_dim": 95,
+                    "input_length": 50,
+                    "embeddings_regularizer": null,
+                    "embeddings_constraint": null,
+                    "name": "embedding_1",
+                    "mask_zero": false,
+                    "trainable": true,
+                    "activity_regularizer": null
+                },
+                "class_name": "Embedding"
+            }, {
+                "config": {
+                    "kernel_constraint": null,
+                    "unroll": false,
+                    "recurrent_initializer": {
+                        "config": {
+                            "gain": 1.0,
+                            "seed": null
+                        },
+                        "class_name": "Orthogonal"
+                    },
+                    "bias_regularizer": null,
+                    "recurrent_regularizer": null,
+                    "return_state": false,
+                    "trainable": true,
+                    "recurrent_dropout": 0.0,
+                    "recurrent_constraint": null,
+                    "use_bias": true,
+                    "kernel_initializer": {
+                        "config": {
+                            "mode": "fan_avg",
+                            "seed": null,
+                            "distribution": "uniform",
+                            "scale": 1.0
+                        },
+                        "class_name": "VarianceScaling"
+                    },
+                    "recurrent_activation": "hard_sigmoid",
+                    "name": "lstm_1",
+                    "dropout": 0.0,
+                    "activation": "relu",
+                    "go_backwards": false,
+                    "units": 500,
+                    "bias_constraint": null,
+                    "kernel_regularizer": null,
+                    "unit_forget_bias": true,
+                    "activity_regularizer": null,
+                    "stateful": false,
+                    "implementation": 1,
+                    "bias_initializer": {
+                        "config": {},
+                        "class_name": "Zeros"
+                    },
+                    "return_sequences": true
+                },
+                "class_name": "LSTM"
+            }, {
+                "config": {
+                    "kernel_constraint": null,
+                    "unroll": false,
+                    "recurrent_initializer": {
+                        "config": {
+                            "gain": 1.0,
+                            "seed": null
+                        },
+                        "class_name": "Orthogonal"
+                    },
+                    "bias_regularizer": null,
+                    "recurrent_regularizer": null,
+                    "return_state": false,
+                    "trainable": true,
+                    "recurrent_dropout": 0.0,
+                    "recurrent_constraint": null,
+                    "use_bias": true,
+                    "kernel_initializer": {
+                        "config": {
+                            "mode": "fan_avg",
+                            "seed": null,
+                            "distribution": "uniform",
+                            "scale": 1.0
+                        },
+                        "class_name": "VarianceScaling"
+                    },
+                    "recurrent_activation": "hard_sigmoid",
+                    "name": "lstm_2",
+                    "dropout": 0.0,
+                    "activation": "relu",
+                    "go_backwards": false,
+                    "units": 500,
+                    "bias_constraint": null,
+                    "kernel_regularizer": null,
+                    "unit_forget_bias": true,
+                    "activity_regularizer": null,
+                    "stateful": false,
+                    "implementation": 1,
+                    "bias_initializer": {
+                        "config": {},
+                        "class_name": "Zeros"
+                    },
+                    "return_sequences": true
+                },
+                "class_name": "LSTM"
+            }, {
+                "config": {
+                    "kernel_constraint": null,
+                    "unroll": false,
+                    "recurrent_initializer": {
+                        "config": {
+                            "gain": 1.0,
+                            "seed": null
+                        },
+                        "class_name": "Orthogonal"
+                    },
+                    "bias_regularizer": null,
+                    "recurrent_regularizer": null,
+                    "return_state": false,
+                    "trainable": true,
+                    "recurrent_dropout": 0.0,
+                    "recurrent_constraint": null,
+                    "use_bias": true,
+                    "kernel_initializer": {
+                        "config": {
+                            "mode": "fan_avg",
+                            "seed": null,
+                            "distribution": "uniform",
+                            "scale": 1.0
+                        },
+                        "class_name": "VarianceScaling"
+                    },
+                    "recurrent_activation": "hard_sigmoid",
+                    "name": "lstm_3",
+                    "dropout": 0.0,
+                    "activation": "relu",
+                    "go_backwards": false,
+                    "units": 500,
+                    "bias_constraint": null,
+                    "kernel_regularizer": null,
+                    "unit_forget_bias": true,
+                    "activity_regularizer": null,
+                    "stateful": false,
+                    "implementation": 1,
+                    "bias_initializer": {
+                        "config": {},
+                        "class_name": "Zeros"
+                    },
+                    "return_sequences": true
+                },
+                "class_name": "LSTM"
+            }, {
+                "config": {
+                    "center": true,
+                    "beta_constraint": null,
+                    "axis": -1,
+                    "moving_mean_initializer": {
+                        "config": {},
+                        "class_name": "Zeros"
+                    },
+                    "moving_variance_initializer": {
+                        "config": {},
+                        "class_name": "Ones"
+                    },
+                    "beta_initializer": {
+                        "config": {},
+                        "class_name": "Zeros"
+                    },
+                    "beta_regularizer": null,
+                    "momentum": 0.99,
+                    "scale": true,
+                    "trainable": true,
+                    "gamma_regularizer": null,
+                    "gamma_initializer": {
+                        "config": {},
+                        "class_name": "Ones"
+                    },
+                    "epsilon": 0.001,
+                    "name": "batch_normalization_1",
+                    "gamma_constraint": null
+                },
+                "class_name": "BatchNormalization"
+            }, {
+                "config": {
+                    "name": "dropout_1",
+                    "trainable": true,
+                    "rate": 0.5,
+                    "seed": null,
+                    "noise_shape": null
+                },
+                "class_name": "Dropout"
+            }, {
+                "config": {
+                    "name": "time_distributed_1",
+                    "trainable": true,
+                    "layer": {
+                        "config": {
+                            "kernel_constraint": null,
+                            "units": 95,
+                            "bias_constraint": null,
+                            "bias_regularizer": null,
+                            "kernel_regularizer": null,
+                            "activity_regularizer": null,
+                            "kernel_initializer": {
+                                "config": {
+                                    "mode": "fan_avg",
+                                    "seed": null,
+                                    "distribution": "uniform",
+                                    "scale": 1.0
+                                },
+                                "class_name": "VarianceScaling"
+                            },
+                            "trainable": true,
+                            "use_bias": true,
+                            "name": "dense_1",
+                            "activation": "linear",
+                            "bias_initializer": {
+                                "config": {},
+                                "class_name": "Zeros"
+                            }
+                        },
+                        "class_name": "Dense"
+                    }
+                },
+                "class_name": "TimeDistributed"
+            }, {
+                "config": {
+                    "name": "activation_1",
+                    "trainable": true,
+                    "activation": "softmax"
+                },
+                "class_name": "Activation"
+            }],
+            "class_name": "Sequential"
+        }
+    },
+    "weightsManifest": [{
+        "paths": ["group1-shard1of6", "group1-shard2of6", "group1-shard3of6", "group1-shard4of6", "group1-shard5of6", "group1-shard6of6"],
+        "weights": [{
+            "name": "embedding_1_1/embeddings",
+            "dtype": "float32",
+            "shape": [95, 500]
+        }, {
+            "name": "lstm_1_1/kernel",
+            "dtype": "float32",
+            "shape": [500, 2000]
+        }, {
+            "name": "lstm_1_1/recurrent_kernel",
+            "dtype": "float32",
+            "shape": [500, 2000]
+        }, {
+            "name": "lstm_1_1/bias",
+            "dtype": "float32",
+            "shape": [2000]
+        }, {
+            "name": "lstm_2_1/kernel",
+            "dtype": "float32",
+            "shape": [500, 2000]
+        }, {
+            "name": "lstm_2_1/recurrent_kernel",
+            "dtype": "float32",
+            "shape": [500, 2000]
+        }, {
+            "name": "lstm_2_1/bias",
+            "dtype": "float32",
+            "shape": [2000]
+        }, {
+            "name": "lstm_3_1/kernel",
+            "dtype": "float32",
+            "shape": [500, 2000]
+        }, {
+            "name": "lstm_3_1/recurrent_kernel",
+            "dtype": "float32",
+            "shape": [500, 2000]
+        }, {
+            "name": "lstm_3_1/bias",
+            "dtype": "float32",
+            "shape": [2000]
+        }, {
+            "name": "time_distributed_1_1/kernel",
+            "dtype": "float32",
+            "shape": [500, 95]
+        }, {
+            "name": "time_distributed_1_1/bias",
+            "dtype": "float32",
+            "shape": [95]
+        }]
+    }]
+}
