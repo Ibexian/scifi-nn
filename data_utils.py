@@ -35,6 +35,7 @@ def file_to_char_ids(filename, char_to_id):
     return [char_to_id[char] for char in data if char in char_to_id]
 
 def load_data(data_path):
+    # TODO Save char_to_id and reversed_dictionary to file for JSON use
     train_path = os.path.join(data_path, "input_data/combined.train.txt")
     valid_path = os.path.join(data_path, "input_data/combined.valid.txt")
 

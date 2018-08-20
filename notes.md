@@ -40,12 +40,14 @@ This tutorial resulted in the barebones of what became my current modeling code 
 
 Epochs are a single pass over the data set - the bigger the data set the longer a single epoch takes - with the expectation that a model can be trained repeatedly over the same data to get better results. So, whereas my initial LSTM training took 6 hours to train - we can now get better results by training for much much longer.
 
-As you may guess - this also presents us with a new problem - if the 'resonably sized' data set took 6 hours for one epoch and the sci-fi data set is 10 times bigger - **a single epoch of sci-fi data would take 60 hours on a CPU**.
+As you may guess - this also presents us with a new problem - if the 'resonably sized' data set took 6 hours for one epoch and the sci-fi data set is 10 times bigger - **a single epoch of sci-fi data would take 60 hours on a CPU**. Since our goal is now multiple epochs this CPU won't cut it.
 
 So let's try using a few GPUs.
 
-## Keras on Google Cloud:
-Since I didn't actually have access to a few GPUs - I turned to the cloud. Luckily I still had money left on my Google Cloud free trial. So let's find a guide to using Keras on the cloud.
+## Take it to the (Google) Cloud: TODO
+Since I didn't actually have access to a few GPUs - I turned to the cloud.
+
+Luckily I still had money left on my Google Cloud free trial. So let's find a guide to using Keras on the cloud.
 
 http://liufuyang.github.io/2017/04/02/just-another-tensorflow-beginner-guide-4.html
 
@@ -54,11 +56,12 @@ tensorflow version - want 1.8 not 1.0 (which is default)
 
 ### 40 hours of training -> ~4 epochs :
 
-    '"white "white <eos> "white...' this is ~9% accurate I guess
+    '"white "white <eos> "white...' 
+This is ~9% accurate, I guess
 
 So, I'd likely need to train it much much longer ~ 50 epochs but I don't have 500 free gpu hours on Google Cloud nor the equivalent $200 to spare, so we need another option
 
-## Character Based Keras:
+## Character Based Keras: TODO
 https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-Recurrent-Neural-Network/
 
 http://karpathy.github.io/2015/05/21/rnn-effectiveness/
@@ -115,7 +118,66 @@ Seeded with "It all began with" :
 ### 121 Epochs (66.4%):
     The only thing that happened to be a man of the Solar System. It was a strange thing that the sun was still there. The sun was still stretching.
 
-## Load into tensorflow.js:
+
+### 369 Epochs (67%) with Improved Generator:
+https://medium.com/@david.campion/text-generation-using-bidirectional-lstm-and-doc2vec-models-1-3-8979eb65cb3a
+
+    CHAPTER II
+
+    A second later, the sun stood before him, then took the recording of the
+    voice of the panthers, and the water started on to the
+    air, looking around and began to scream across the atmosphere.
+
+    The car shot back to the earth, the last weapon give it to
+    the first three of the barbarians in their shadows and seats had been pursuing and beautiful
+    from the crowd of green colours. The shape of the southern
+    hemisphere became a mere bright face that carried on
+    their tracks and the counters of the full moon.
+
+    "But why don't you rise another direction?" the socio
+
+    narrowed the paratime ship and raised his arm from the controls. He was a few small glasses.
+    He had done the story from the earth. The Professor suggested that the water was still twenten the electric galley and the mass of the same as those somewhat dead leaf, and which had been the most important except to support them.
+
+    "Your spirit is finished."
+
+    "What else have you done the same?" 
+    "The great planet is a good word of that thing as the scene of the air
+    light that had been the professor and the sun which was sinned and hard and seemed to wait till they were in
+    any case. The sky was all the mornings are strewn with short windows. The boy standing on the steps he was unable
+    to put another of the past and her people have a chance to see the constant contemptuous beam as the sound of the earth was concerned and the best thing that had been so precisely seen there was no help, and the doctor made the world as ourselves of the speed of the barbecue and planning as the discoverer was able to pick out a recording to the construction of the
+    handle of their conversation. Her brother was a shadow from the surface and the walls rolled it upon them,
+    came through a scrap of stars and shells, and the heat was
+    the strange beauty of the telescope to the side of
+    the room for several moments. I have seen those things that were there. There was not a strange report, and the other side of the collection of the negative country
+
+## The Wall that 67% Built
+
+After training for hours and hours (to epoch 500) it's pretty clear that my current method/data set aren't going to make a model with an accuracy much higher than 67%
+
+While this still beats my initial goal of 65% accuracy - it still leaves a lot to be desired. Rather than sticking to my LSTM model method I tried a few additional layer types and combinations before admitting defeat:
+
+#### Bidirectional? [x] TODO
+
+Lots of false positives - accuracy goes up to 97% on paper, but the actual generation results were terrible - ususally something like:
+
+    She She She She She She She She
+
+https://medium.com/@david.campion/text-generation-using-bidirectional-lstm-and-doc2vec-models-1-3-8979eb65cb3a
+
+https://arxiv.org/pdf/1602.00367.pdf - mimic this structure with and without cnn
+
+#### GRU? [x] 
+
+Gated Recurrent Units (GRUs) are similar to LSTM, but have only two gates to manage variable memory. This means that GRUs should train faster ([Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling](https://arxiv.org/pdf/1412.3555v1.pdf)) and perform better if there is a single output ([Efficiently applying attention to sequential data with the Recurrent Discounted Attention unit](https://openreview.net/forum?id=BJ78bJZCZ)). For my data, however, a GRU based system trained and converged slower than the LSTM version.
+
+#### Change the Optimizer (again) TODO
+This did help with speeding up convergence and squeezed out another percent of accuracy
+
+from [this paper](https://yerevann.github.io/2016/06/26/combining-cnn-and-rnn-for-spoken-language-identification/)
+
+
+## Loading into tensorflow.js:
 Once I had a model I was fairly satisfied with It was time to move on to phase two - turning this awful machine learning model into an awful web app. Thanks to Keras - the model I had trained was readily convertable to JSON for use with tensorflow.js.
 
 ```bash
@@ -131,3 +193,18 @@ To load these into JS you only need to import Tensorflow.js and the `model.json`
 import * as tf from '@tensorflow/tfjs';
 const model = await tf.loadModel('model.json');
 ```
+
+Using parcel as a bundler for the npm package
+
+### Save the output of `generateText` as JSON
+#### Reversed Dictionary
+```javascript
+{0: ' ', 1: 'e', 2: 't', 3: 'a', 4: 'o', 5: 'n', 6: 'i', 7: 'h', 8: 's', 9: 'r', 10: 'd', 11: 'l', 12: 'u', 13: '\n', 14: 'c', 15: 'm', 16: 'f', 17: 'w', 18: 'g', 19: 'y', 20: 'p', 21: ',', 22: 'b', 23: '.', 24: 'v', 25: '"', 26: 'k', 27: 'I', 28: '-', 29: 'T', 30: "'", 31: 'A', 32: 'S', 33: 'H', 34: 'x', 35: 'W', 36: 'B', 37: '?', 38: 'M', 39: 'C', 40: ';', 41: 'j', 42: '!', 43: 'N', 44: 'R', 45: 'q', 46: 'z', 47: 'L', 48: 'P', 49: 'D', 50: 'O', 51: 'E', 52: 'F', 53: 'Y', 54: 'G', 55: 'V', 56: '_', 57: 'K', 58: 'J', 59: '0', 60: ':', 61: 'U', 62: '*', 63: '1', 64: 'Z', 65: '2', 66: 'X', 67: '8', 68: '`', 69: '3', 70: '5', 71: '4', 72: '(', 73: ')', 74: '6', 75: '9', 76: '7', 77: 'Q', 78: '#', 79: '[', 80: ']', 81: '�', 82: '@', 83: '/', 84: '=', 85: '{', 86: '}', 87: '$', 88: '&', 89: '\\', 90: '~', 91: '^', 92: '+', 93: '<', 94: '>'}
+```
+#### Char_To_ID
+```javascript
+{'z': 46, '!': 42, 'K': 57, '1': 63, ')': 73, '/': 83, 'A': 31, '3': 69, 'I': 27, '=': 84, '(': 72, 'Y': 53, '#': 78, 'J': 58, 'c': 14, 'O': 50, 'C': 39, 'h': 7, 'w': 17, '\n': 13, '"': 25, '}': 86, 'x': 34, '8': 67, 'r': 9, '^': 91, 'Z': 64, '<': 93, '5': 70, ',': 21, '+': 92, 'U': 61, 'P': 48, 'B': 36, '[': 79, 'G': 54, '*': 62, ':': 60, '$': 87, 'e': 1, 's': 8, 'm': 15, 'H': 33, '&': 88, '\\': 89, 'W': 35, 'Q': 77, 'X': 66, '~': 90, 'u': 12, 'k': 26, 'D': 49, ' ': 0, '-': 28, ';': 40, '2': 65, '�': 81, 'i': 6, "'": 30, 'q': 45, 'R': 44, 'v': 24, 't': 2, 'g': 18, 'E': 51, 'V': 55, 'j': 41, '@': 82, '`': 68, 'S': 32, '.': 23, 'n': 5, '7': 76, '4': 71, 'd': 10, '>': 94, '6': 74, 'T': 29, ']': 80, '?': 37, '9': 75, '_': 56, 'a': 3, 'b': 22, '0': 59, '{': 85, 'y': 19, 'F': 52, 'N': 43, 'M': 38, 'p': 20, 'o': 4, 'L': 47, 'l': 11, 'f': 16}
+```
+
+Things needed for Web APP:
+- New Text Generator + Sampling Function

@@ -4,7 +4,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from keras.models import Sequential, load_model
-from keras.layers import Dense, Activation, Embedding, Flatten, Dropout, TimeDistributed, Reshape, Lambda
+from keras.layers import Dense, Activation, Embedding, Flatten, Dropout, TimeDistributed, Reshape, Lambda, Bidirectional
 from keras.layers import LSTM, BatchNormalization
 from keras.optimizers import RMSprop, Adam, SGD, Adamax
 from keras import backend as K
@@ -56,24 +56,26 @@ batch_size = 128 #20
 train_data_generator = KerasBatchGenerator(train_data, num_steps, batch_size, vocabulary, skip_step=num_steps)
 valid_data_generator = KerasBatchGenerator(valid_data, num_steps, batch_size, vocabulary, skip_step=num_steps)
 
-hidden_size = 500 # Maybe switch to 700
-use_dropout = True
+hidden_size = 500
 # Build the network using sequential
 model = Sequential()
+# Convert Indexes to Dense Vectors
 model.add(Embedding(vocabulary, hidden_size, input_length=num_steps))
+# Three Layers of LSTM
 model.add(LSTM(hidden_size, return_sequences=True, activation='relu'))
 model.add(LSTM(hidden_size, return_sequences=True, activation='relu'))
 model.add(LSTM(hidden_size, return_sequences=True, activation='relu'))
+# Use normalization and Dropout to prevent overfitting
 model.add(BatchNormalization())
-if use_dropout:
-    model.add(Dropout(0.5))
+model.add(Dropout(0.5))
+# Add layer for each time step (good for sequencial data)
 model.add(TimeDistributed(Dense(vocabulary)))
 model.add(Activation('softmax'))
-
-model.compile(loss='categorical_crossentropy', optimizer=Adamax(lr=0.002, beta_1=0.9, beta_2=0.999), metrics=['categorical_accuracy'])
+# Begin by using Adadelta for the first few epochs
+model.compile(loss='categorical_crossentropy', optimizer='Adadelta', metrics=['categorical_accuracy'])
 print(model.summary())
 checkpointer = ModelCheckpoint(filepath=data_path + '/model-{epoch:02d}.hdf5', verbose=1)
-num_epochs = 200
+num_epochs = 500
 
 if args.run_opt == "train":
     model.fit_generator(train_data_generator.generate(), len(train_data)//(batch_size*num_steps), num_epochs, \
@@ -83,8 +85,10 @@ if args.run_opt == "train":
 elif args.run_opt == "continue":
     currentModel, currentModelNumber = get_current_model(data_path)
     model = load_model(currentModel)
-    batch_size = batch_size + (currentModelNumber * 5) #Assign a new batch size when continuing training (this only fires when starting/restarting the training)
+    bigger_batch_size = batch_size + (currentModelNumber * 20)
+    batch_size = bigger_batch_size if bigger_batch_size < 2600 else 2600 #Assign a new batch size when continuing training (this only fires when starting/restarting the training)
     checkpointer = ModelCheckpoint(filepath=data_path + '/model-{epoch:02d}.hdf5', verbose=1, monitor='categorical_accuracy', save_best_only=True, mode='auto')
+    model.compile(loss='categorical_crossentropy', optimizer=SGD(lr=0.003, momentum=0.000003), metrics=['categorical_accuracy'])
     print("Learning Rate: ", end="")
     print(K.eval(model.optimizer.lr))
     print("Batch Size: ", end="")
