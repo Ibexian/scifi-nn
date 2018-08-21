@@ -178,20 +178,38 @@ from [this paper](https://yerevann.github.io/2016/06/26/combining-cnn-and-rnn-fo
 
 
 ## Loading into tensorflow.js:
-Once I had a model I was fairly satisfied with It was time to move on to phase two - turning this awful machine learning model into an awful web app. Thanks to Keras - the model I had trained was readily convertable to JSON for use with tensorflow.js.
+[Did not work - had to use keras-js, which also did not work, issues with converting from hdf5 to bin - weights didn't line up - published as ibexian-keras-js]
+Once I had a model I was fairly satisfied with It was time to move on to phase two - turning this awful machine learning model into an awful web app. Thanks to Keras - the model I had trained was readily convertable to JSON for use with tensorflow.js - or so I thought.
 
+Tensorflow.js ships with a converter to enable conversion from keras:
 ```bash
 pip install tensorflowjs
 tensorflowjs_converter --input_format keras \
                        path/to/my_model.hdf5 \
                        path/to/tfjs_target_dir
 ```
-This makes a `model.json` as well as several shard files of the weights (e.g. `group1-shard1of6`).
+Which is great in principle, but in practice it didn't work. There was an isue with my weights not loading into tensorflow - beyond the model conversion not working out of the box tensorflow.js made my browser slow to a crawl.
 
-To load these into JS you only need to import Tensorflow.js and the `model.json`.
+### There's got to be a better way!
+
+So, what else is there? Keras-js, although depreciated in February, has it's own conversion method (that makes smaller model files than tensorflowjs) and doesn't seem to make the browser melt. 
+
+But even this library didn't all my problems. Out of the box - keras-js had the same issue as tensorflowjs of my model weights not linking to the layers. Thankfully, since the converter was written in python, a few changes on my end and I had a converter that the browser could actually read.
+
+Since keras-js is no longer supported and keras is on a newer version - the wrapper layers also don't behave when loaded, so I ended up forking keras-js, fixing the wrappers, and re-publishing it as `ibexian-keras-js`.
+
+```bash
+npm install ibexian-keras-js
+python node_modules/ibexian-keras-js/python/encoder.py  ./final_model.hdf5
+```
+
+To load these into JS you only need to import ibexian-keras-js and the `final_model.bin`.
 ```javascript
-import * as tf from '@tensorflow/tfjs';
-const model = await tf.loadModel('model.json');
+import KerasJS from 'ibexian-keras-js'
+const model = new KerasJS.Model({
+    filepath: 'final_model.bin'
+});
+model.ready().then(() => { Do Something })
 ```
 
 Using parcel as a bundler for the npm package
