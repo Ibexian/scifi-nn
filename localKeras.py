@@ -98,7 +98,6 @@ elif args.run_opt == "continue":
         validation_data=valid_data_generator.generate(), validation_steps=len(valid_data)//(batch_size * num_steps), callbacks=[checkpointer, TerminateOnNaN()], initial_epoch=currentModelNumber)
 
     model.save(data_path + "final_model.hdf5")
-    tfjs.converters.save_keras_model(model, data_path + "json_model")
 elif args.run_opt == "test":
     currentModel, _ = get_current_model(data_path)
     model = load_model(currentModel)

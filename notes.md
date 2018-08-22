@@ -119,7 +119,7 @@ Seeded with "It all began with" :
     The only thing that happened to be a man of the Solar System. It was a strange thing that the sun was still there. The sun was still stretching.
 
 
-### 369 Epochs (67%) with Improved Generator:
+### 369 Epochs (67%) with Improved Generator: TODO
 https://medium.com/@david.campion/text-generation-using-bidirectional-lstm-and-doc2vec-models-1-3-8979eb65cb3a
 
     CHAPTER II
@@ -212,8 +212,6 @@ const model = new KerasJS.Model({
 model.ready().then(() => { Do Something })
 ```
 
-Using parcel as a bundler for the npm package
-
 ### Save the output of `generateText` as JSON
 #### Reversed Dictionary
 ```javascript
@@ -224,5 +222,27 @@ Using parcel as a bundler for the npm package
 {'z': 46, '!': 42, 'K': 57, '1': 63, ')': 73, '/': 83, 'A': 31, '3': 69, 'I': 27, '=': 84, '(': 72, 'Y': 53, '#': 78, 'J': 58, 'c': 14, 'O': 50, 'C': 39, 'h': 7, 'w': 17, '\n': 13, '"': 25, '}': 86, 'x': 34, '8': 67, 'r': 9, '^': 91, 'Z': 64, '<': 93, '5': 70, ',': 21, '+': 92, 'U': 61, 'P': 48, 'B': 36, '[': 79, 'G': 54, '*': 62, ':': 60, '$': 87, 'e': 1, 's': 8, 'm': 15, 'H': 33, '&': 88, '\\': 89, 'W': 35, 'Q': 77, 'X': 66, '~': 90, 'u': 12, 'k': 26, 'D': 49, ' ': 0, '-': 28, ';': 40, '2': 65, '�': 81, 'i': 6, "'": 30, 'q': 45, 'R': 44, 'v': 24, 't': 2, 'g': 18, 'E': 51, 'V': 55, 'j': 41, '@': 82, '`': 68, 'S': 32, '.': 23, 'n': 5, '7': 76, '4': 71, 'd': 10, '>': 94, '6': 74, 'T': 29, ']': 80, '?': 37, '9': 75, '_': 56, 'a': 3, 'b': 22, '0': 59, '{': 85, 'y': 19, 'F': 52, 'N': 43, 'M': 38, 'p': 20, 'o': 4, 'L': 47, 'l': 11, 'f': 16}
 ```
 
-Things needed for Web APP:
-- New Text Generator + Sampling Function
+## [Computer, Write me a Sci-fi](https://github.com/Ibexian/writeMeAScifi)
+Based on the above model work I've made [a small web app](https://william.kamovit.ch/writeMeAScifi/) that slowly (and I do mean slowly) generates text based on user input.
+
+This app - built on parcel, numjs, keras-js, and others - mimics the `generateScifi.py` script in this repo - only slower and in the browser.
+
+![demo gif](wmasf-demo.gif "Web Demo")
+
+Did I mention how slow it is?
+
+### One Final Problem
+When I first put the app online the predictions became terrible (more garbled than normal) - I
+tried:
+- Removing the sampling (thinking it was the math libs getting corrupted)
+- Moving the final_model.bin out of parcel (thinking the .bin was being garbled)
+- In the end it seems that keras-js was breaking when parcel minimized it for the web 
+
+## What's next?
+
+### WASM for predictions
+Re-write predictions in Rust: 
+https://github.com/tensorflow/rust
+
+Then package it as a wasm npm module: 
+https://github.com/rustwasm/wasm-pack
