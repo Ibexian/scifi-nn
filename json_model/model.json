@@ -50,7 +50,7 @@
                             "gain": 1.0,
                             "seed": null
                         },
-                        "class_name": "Orthogonal"
+                        "class_name": "Ones"
                     },
                     "bias_regularizer": null,
                     "recurrent_regularizer": null,
@@ -96,7 +96,7 @@
                             "gain": 1.0,
                             "seed": null
                         },
-                        "class_name": "Orthogonal"
+                        "class_name": "Ones"
                     },
                     "bias_regularizer": null,
                     "recurrent_regularizer": null,
@@ -142,7 +142,7 @@
                             "gain": 1.0,
                             "seed": null
                         },
-                        "class_name": "Orthogonal"
+                        "class_name": "Ones"
                     },
                     "bias_regularizer": null,
                     "recurrent_regularizer": null,
