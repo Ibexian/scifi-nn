@@ -181,37 +181,6 @@
                 "class_name": "LSTM"
             }, {
                 "config": {
-                    "center": true,
-                    "beta_constraint": null,
-                    "axis": -1,
-                    "moving_mean_initializer": {
-                        "config": {},
-                        "class_name": "Zeros"
-                    },
-                    "moving_variance_initializer": {
-                        "config": {},
-                        "class_name": "Ones"
-                    },
-                    "beta_initializer": {
-                        "config": {},
-                        "class_name": "Zeros"
-                    },
-                    "beta_regularizer": null,
-                    "momentum": 0.99,
-                    "scale": true,
-                    "trainable": true,
-                    "gamma_regularizer": null,
-                    "gamma_initializer": {
-                        "config": {},
-                        "class_name": "Ones"
-                    },
-                    "epsilon": 0.001,
-                    "name": "batch_normalization_1",
-                    "gamma_constraint": null
-                },
-                "class_name": "BatchNormalization"
-            }, {
-                "config": {
                     "name": "dropout_1",
                     "trainable": true,
                     "rate": 0.5,
