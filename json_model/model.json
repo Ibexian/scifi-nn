@@ -267,51 +267,51 @@
     "weightsManifest": [{
         "paths": ["group1-shard1of6", "group1-shard2of6", "group1-shard3of6", "group1-shard4of6", "group1-shard5of6", "group1-shard6of6"],
         "weights": [{
-            "name": "embedding_1_1/embeddings",
+            "name": "embedding_1/embeddings",
             "dtype": "float32",
             "shape": [95, 500]
         }, {
-            "name": "lstm_1_1/kernel",
+            "name": "lstm_1/kernel",
             "dtype": "float32",
             "shape": [500, 2000]
         }, {
-            "name": "lstm_1_1/recurrent_kernel",
+            "name": "lstm_1/recurrent_kernel",
             "dtype": "float32",
             "shape": [500, 2000]
         }, {
-            "name": "lstm_1_1/bias",
+            "name": "lstm_1/bias",
             "dtype": "float32",
             "shape": [2000]
         }, {
-            "name": "lstm_2_1/kernel",
+            "name": "lstm_2/kernel",
             "dtype": "float32",
             "shape": [500, 2000]
         }, {
-            "name": "lstm_2_1/recurrent_kernel",
+            "name": "lstm_2/recurrent_kernel",
             "dtype": "float32",
             "shape": [500, 2000]
         }, {
-            "name": "lstm_2_1/bias",
+            "name": "lstm_2/bias",
             "dtype": "float32",
             "shape": [2000]
         }, {
-            "name": "lstm_3_1/kernel",
+            "name": "lstm_3/kernel",
             "dtype": "float32",
             "shape": [500, 2000]
         }, {
-            "name": "lstm_3_1/recurrent_kernel",
+            "name": "lstm_3/recurrent_kernel",
             "dtype": "float32",
             "shape": [500, 2000]
         }, {
-            "name": "lstm_3_1/bias",
+            "name": "lstm_3/bias",
             "dtype": "float32",
             "shape": [2000]
         }, {
-            "name": "time_distributed_1_1/kernel",
+            "name": "time_distributed_1/kernel",
             "dtype": "float32",
             "shape": [500, 95]
         }, {
-            "name": "time_distributed_1_1/bias",
+            "name": "time_distributed_1/bias",
             "dtype": "float32",
             "shape": [95]
         }]
