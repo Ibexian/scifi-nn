@@ -44,31 +44,40 @@ As you may guess - this also presents us with a new problem - if the 'resonably 
 
 So let's try using a few GPUs.
 
-## Take it to the (Google) Cloud: TODO
+## Take it to the (Google) Cloud:
 Since I didn't actually have access to a few GPUs - I turned to the cloud.
 
 Luckily I still had money left on my Google Cloud free trial. So let's find a guide to using Keras on the cloud.
 
 http://liufuyang.github.io/2017/04/02/just-another-tensorflow-beginner-guide-4.html
 
-issues with getting it to run as a module -> kerasLSTM/
-tensorflow version - want 1.8 not 1.0 (which is default)
+Again, as is the theme of this project, there was a gotcha. Since keras, unlike tensorflow, doesn't work with google cloud's ML out of the box, it took a bit of work to get it running. The trick ended up being having to convert my keras.py into a module folder `kerasLSTM` complete with a `cloudml-gpu.yaml` settings file.
+
+So with the full weight of 3 GPUs in my corner - we were good to go.
 
 ### 40 hours of training -> ~4 epochs :
 
     '"white "white <eos> "white...' 
 This is ~9% accurate, I guess
 
-So, I'd likely need to train it much much longer ~ 50 epochs but I don't have 500 free gpu hours on Google Cloud nor the equivalent $200 to spare, so we need another option
+So, I'd likely need to train it much much longer (ideally around 50 epochs), but I don't have 500 free GPU hours on Google Cloud nor the equivalent $200 to spare, so we need another option.
 
-## Character Based Keras: TODO
-https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-Recurrent-Neural-Network/
+## Character Based Keras:
 
-http://karpathy.github.io/2015/05/21/rnn-effectiveness/
+Many of the [initial LSTM example blogs](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) I had read used a [character based learning](https://chunml.github.io/ChunML.github.io/project/Creating-Text-Generator-Using-Recurrent-Neural-Network/) as opposed to the word based method I'd been trying. Since it had been effective for them I decided to give it a try.
 
-At initial glance this method is much better for my data - it takes about 1 hr per epoch AND and has accuracy almost immediately above 10%!
+Character based training had a few advantages over word based training:
+
+- The number of variables to train on dropped from several thousand (words) to less than one hundred (characters)
+- Since there's a lot fewer input variables the training time can be _much_ shorter
+- It removes the need to remove punctuation and carriage returns from the training
+
+On first run, the character method immediately proved itself superior - training a full epoch in about an hour with a resultant accuracy above 10%. Now we're getting somewhere.
+
 
 ## Proof of Concept trained on the writings of Melville:
+
+As with the word based trainings I decided to use the works of Melville as an initial proof of concept text sample and began running the training in ernest.
 
 ### 1 epoch:
     the stranger of the sailors of the sailors of the sailors of the stranger of the stranger of the stranger of the stranger of the stranger of
@@ -94,7 +103,7 @@ When trying to train on the sci-fi with the same params - (seq length - 140, bat
 
 To avoid needlessly running the training with a `NaN` value for loss Keras has a nice helper function you can bind as a callback to `model.fit` called `TerminateOnNaN` which saves the model and stops training if the loss becomes `NaN`.
 
-But, just stopping my training isn't the goal - so I changed the optimization method (adadelta -> adam -> rmsprop), activation methods (softmax -> relu -> both), the batch size (140 -> 30 -> 50), the step size (20 -> 128), the ammount of data normalization (0 -> 3 -> 1) and in the end found a combination that got passed the 35% accuracy mark (without NaN for the loss). Each data set can be a bit different, so these might require some adjustment for other text data.
+But, just stopping my training isn't the goal - so I changed the optimization method (adadelta -> adam -> rmsprop), activation methods (softmax -> relu -> both), the batch size (140 -> 30 -> 50), the step size (20 -> 128), the ammount of data normalization (0 -> 3 -> 1) and in the end found a combination that got past the 35% accuracy mark (without NaN for the loss). Each data set can be a bit different, so these might require some adjustment for other text data.
 
 It seems the NaN issue is some combination of the learning rate, the batch size, and the momentum (determined by the optimization method) - I can decrease the learning rate or increase the batch size as the epoch increases in order to avoid getting NaN. Momentum trains faster, but can also lead to "hill climbs" where the loss rate increases rather than decreases.
 
@@ -119,8 +128,33 @@ Seeded with "It all began with" :
     The only thing that happened to be a man of the Solar System. It was a strange thing that the sun was still there. The sun was still stretching.
 
 
-### 369 Epochs (67%) with Improved Generator: TODO
-https://medium.com/@david.campion/text-generation-using-bidirectional-lstm-and-doc2vec-models-1-3-8979eb65cb3a
+## 369 Epochs (67%) with an Improved Generator:
+
+As I neared and surpassed my initial accuracy target (65%) I was still a bit disatisfied by the generator's tendency to get itself stuck in loops (`'see the stars and the stars were allowed to see the stars'`) and its preference for the letter 's'.
+
+After reviewing [how others had handled this problem](https://medium.com/@david.campion/text-generation-using-bidirectional-lstm-and-doc2vec-models-1-3-8979eb65cb3a), I figured sampling the predictions would present the type of output I was looking for. My sampling function, given a `rate` and a prediction `array` would use `log`, `exp`, and normalization (by dividing by total) to create an array of probabilities.
+
+```python
+    # Modify the prediction array by temp - to avoid always picking the best prediction
+    # Higher temp will result in more varied prediction results
+    preds = np.asarray(preds).astype('float64')
+    # ignore the log of zero issues
+    np.seterr(divide='ignore')
+    preds = np.log(preds) / temperature
+    # reenable the warn
+    np.seterr(divide='warn')
+    exp_preds = np.exp(preds)
+    # Normalize the probability inputs
+    preds = exp_preds / np.sum(exp_preds)
+```
+Using this array of probabilities for each character we simply use a multinomial to roll some dice and pick a winner:
+``` python
+    probabilities = np.random.multinomial(1, preds, 1)
+    return np.argmax(probabilities)
+```
+
+In the end, with a sampling rate of `0.4`, I ended up with something like this:
+
 
     CHAPTER II
 
@@ -157,29 +191,28 @@ After training for hours and hours (to epoch 500) it's pretty clear that my curr
 
 While this still beats my initial goal of 65% accuracy - it still leaves a lot to be desired. Rather than sticking to my LSTM model method I tried a few additional layer types and combinations before admitting defeat:
 
-#### Bidirectional? [x] TODO
+#### Bidirectional? ❌
 
-Lots of false positives - accuracy goes up to 97% on paper, but the actual generation results were terrible - ususally something like:
+What could be better than a single direction LSTM? A two direction LSTM? 
+
+A bidirectional LSTM takes its input data and runs it both forwards and backwards to predict the next (and previous) character in the sequence. Which should, in theory, give a better picture of the data set we're trying to replicate. [Others had used this method](https://medium.com/@david.campion/text-generation-using-bidirectional-lstm-and-doc2vec-models-1-3-8979eb65cb3a) with a similar goal with some pretty solid results. 
+
+For my data, however, it only gave me lots of false positives. My accuracy measurements went up to up to 97%, but both the validation results (those checked against non-training data) and the generation results were terrible. The model tended to generate something like:
 
     She She She She She She She She
 
-https://medium.com/@david.campion/text-generation-using-bidirectional-lstm-and-doc2vec-models-1-3-8979eb65cb3a
+It's possible this method lends itself better to a word based training, but for our purposes it was a dead end.
 
-https://arxiv.org/pdf/1602.00367.pdf - mimic this structure with and without cnn
-
-#### GRU? [x] 
+#### GRU? ❌ 
 
 Gated Recurrent Units (GRUs) are similar to LSTM, but have only two gates to manage variable memory. This means that GRUs should train faster ([Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling](https://arxiv.org/pdf/1412.3555v1.pdf)) and perform better if there is a single output ([Efficiently applying attention to sequential data with the Recurrent Discounted Attention unit](https://openreview.net/forum?id=BJ78bJZCZ)). For my data, however, a GRU based system trained and converged slower than the LSTM version.
 
-#### Change the Optimizer (again) TODO
-This did help with speeding up convergence and squeezed out another percent of accuracy
+#### Change the Optimizer (again) ✅ 
 
-from [this paper](https://yerevann.github.io/2016/06/26/combining-cnn-and-rnn-for-spoken-language-identification/)
-
+In the end the only modification that helped at all was a further tweaking of the optimizer, momentum, and learning rate. As [this paper](https://yerevann.github.io/2016/06/26/combining-cnn-and-rnn-for-spoken-language-identification/) showed - starting with one optimizer (`Adadelta`) for the first few epochs to speed up convergence and then switching to another (`SGD`) to avoid too many "hill climbs" or `NaN` issues can squeeze out a bit more accuracy.
 
 ## Loading into tensorflow.js:
-[Did not work - had to use keras-js, which also did not work, issues with converting from hdf5 to bin - weights didn't line up - published as ibexian-keras-js]
-Once I had a model I was fairly satisfied with It was time to move on to phase two - turning this awful machine learning model into an awful web app. Thanks to Keras - the model I had trained was readily convertable to JSON for use with tensorflow.js - or so I thought.
+Once I had a model I was fairly satisfied with -  It was time to move on to phase two - turning this awful machine learning model into an awful web app. Thanks to Keras - the model I had trained was readily convertable to JSON for use with tensorflow.js - or so I thought.
 
 Tensorflow.js ships with a converter to enable conversion from keras:
 ```bash
@@ -188,13 +221,13 @@ tensorflowjs_converter --input_format keras \
                        path/to/my_model.hdf5 \
                        path/to/tfjs_target_dir
 ```
-Which is great in principle, but in practice it didn't work. There was an isue with my weights not loading into tensorflow - beyond the model conversion not working out of the box tensorflow.js made my browser slow to a crawl.
+Which is great in principle, but in practice it didn't work. There was an isue with my weights not loading into tensorflow (this turned out to be the same issue as below), but even once I got the loading to work the model initialization brought my browser to a crawl. 
 
 ### There's got to be a better way!
 
 So, what else is there? Keras-js, although depreciated in February, has it's own conversion method (that makes smaller model files than tensorflowjs) and doesn't seem to make the browser melt. 
 
-But even this library didn't all my problems. Out of the box - keras-js had the same issue as tensorflowjs of my model weights not linking to the layers. Thankfully, since the converter was written in python, a few changes on my end and I had a converter that the browser could actually read.
+But even this library didn't solve all my problems. Out of the box - keras-js had the same issue as tensorflowjs of my model weights not linking to the layers. Thankfully, since the converter was written in python, a few changes on my end and I had a converter that the browser could actually read.
 
 Since keras-js is no longer supported and keras is on a newer version - the wrapper layers also don't behave when loaded, so I ended up forking keras-js, fixing the wrappers, and re-publishing it as `ibexian-keras-js`.
 
@@ -237,12 +270,3 @@ tried:
 - Removing the sampling (thinking it was the math libs getting corrupted)
 - Moving the final_model.bin out of parcel (thinking the .bin was being garbled)
 - In the end it seems that keras-js was breaking when parcel minimized it for the web 
-
-## What's next?
-
-### WASM for predictions
-Re-write predictions in Rust: 
-https://github.com/tensorflow/rust
-
-Then package it as a wasm npm module: 
-https://github.com/rustwasm/wasm-pack
