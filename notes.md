@@ -1,6 +1,6 @@
 # Sci-fi NN
 
-After reading about [how amazing LSTM and Word2Vec are at Natural Language Processing](http://colah.github.io/posts/2014-07-NLP-RNNs-Representations/) and taking a few online courses on Neural Network basics - I decided I had to try it out for myself. But, with any machine learning / NN modeling project what data to use and where to get it are always some of the biggest questions of the whole project. Luckily for me Project Guteberg exists.
+After reading about [how amazing LSTM and Word2Vec are at Natural Language Processing](http://colah.github.io/posts/2014-07-NLP-RNNs-Representations/) and taking a few online courses on Neural Network basics - I decided I had to try it out for myself. But, with any machine learning / NN modeling project what data to use and where to get it are always some of the biggest questions of the whole project. Luckily for me Project Gutenberg exists.
 ## Get the data:
 [Project Gutenberg's](https://www.gutenberg.org/) public domain library of books is an incredible resource for all kinds of books and their [catalogue of Science Fiction](https://www.gutenberg.org/wiki/Science_Fiction_(Bookshelf)) is no exception. They've even collected most of the materials into a downloadable CD, which, since we're looking for lots of Sci-Fi to base the neurnal network on, is exactly what we need.
 
@@ -40,7 +40,7 @@ This tutorial resulted in the barebones of what became my current modeling code 
 
 Epochs are a single pass over the data set - the bigger the data set the longer a single epoch takes - with the expectation that a model can be trained repeatedly over the same data to get better results. So, whereas my initial LSTM training took 6 hours to train - we can now get better results by training for much much longer.
 
-As you may guess - this also presents us with a new problem - if the 'resonably sized' data set took 6 hours for one epoch and the sci-fi data set is 10 times bigger - **a single epoch of sci-fi data would take 60 hours on a CPU**. Since our goal is now multiple epochs this CPU won't cut it.
+As you may guess - this also presents us with a new problem - if the 'reasonably sized' data set took 6 hours for one epoch and the sci-fi data set is 10 times bigger - **a single epoch of sci-fi data would take 60 hours on a CPU**. Since our goal is now multiple epochs this CPU won't cut it.
 
 So let's try using a few GPUs.
 
@@ -77,7 +77,7 @@ On first run, the character method immediately proved itself superior - training
 
 ## Proof of Concept trained on the writings of Melville:
 
-As with the word based trainings I decided to use the works of Melville as an initial proof of concept text sample and began running the training in ernest.
+As with the word based trainings I decided to use the works of Melville as an initial proof of concept text sample and began running the training in earnest.
 
 ### 1 epoch:
     the stranger of the sailors of the sailors of the sailors of the stranger of the stranger of the stranger of the stranger of the stranger of
@@ -96,7 +96,7 @@ As with the word based trainings I decided to use the works of Melville as an in
     is the Captain of the officers of the Purser's Steward as a common sailor, and the sailors were set forth in the ship's boat, and the same strange strict and solemn of the sea and the same strange strip of a strange sort of state as the same strange strip of state as the ship is almost a sort of strange dog the same thing to be a sort of state of sea-waters
 
 ## Begin Training on Sci-fi Data - Target Accuracy ~65%
-The training data for the Melvile works above was about 3.5Mb and each epoch took about 50 min. The sci-fi data is considerably bigger - 12.7Mb (which is reduced from the originaly planned 40mb) so each epoch takes about 4 hours.
+The training data for the Melville works above was about 3.5Mb and each epoch took about 50 min. The sci-fi data is considerably bigger - 12.7Mb (which is reduced from the originaly planned 40mb) so each epoch takes about 4 hours.
 
 ### The Trouble with NaN
 When trying to train on the sci-fi with the same params - (seq length - 140, batch length - 20, two lstm layers etc.) Training would get to a certain point (usually 35% accuracy) and the loss would change to `NaN` and the accuracy would plummet.
@@ -130,7 +130,7 @@ Seeded with "It all began with" :
 
 ## 369 Epochs (67%) with an Improved Generator:
 
-As I neared and surpassed my initial accuracy target (65%) I was still a bit disatisfied by the generator's tendency to get itself stuck in loops (`'see the stars and the stars were allowed to see the stars'`) and its preference for the letter 's'.
+As I neared and surpassed my initial accuracy target (65%) I was still a bit dissatisfied by the generator's tendency to get itself stuck in loops (`'see the stars and the stars were allowed to see the stars'`) and its preference for the letter 's'.
 
 After reviewing [how others had handled this problem](https://medium.com/@david.campion/text-generation-using-bidirectional-lstm-and-doc2vec-models-1-3-8979eb65cb3a), I figured sampling the predictions would present the type of output I was looking for. My sampling function, given a `rate` and a prediction `array` would use `log`, `exp`, and normalization (by dividing by total) to create an array of probabilities.
 
@@ -212,7 +212,7 @@ Gated Recurrent Units (GRUs) are similar to LSTM, but have only two gates to man
 In the end the only modification that helped at all was a further tweaking of the optimizer, momentum, and learning rate. As [this paper](https://yerevann.github.io/2016/06/26/combining-cnn-and-rnn-for-spoken-language-identification/) showed - starting with one optimizer (`Adadelta`) for the first few epochs to speed up convergence and then switching to another (`SGD`) to avoid too many "hill climbs" or `NaN` issues can squeeze out a bit more accuracy.
 
 ## Loading into tensorflow.js:
-Once I had a model I was fairly satisfied with -  It was time to move on to phase two - turning this awful machine learning model into an awful web app. Thanks to Keras - the model I had trained was readily convertable to JSON for use with tensorflow.js - or so I thought.
+Once I had a model I was fairly satisfied with -  It was time to move on to phase two - turning this awful machine learning model into an awful web app. Thanks to Keras - the model I had trained was readily convertible to JSON for use with tensorflow.js - or so I thought.
 
 Tensorflow.js ships with a converter to enable conversion from keras:
 ```bash
@@ -221,7 +221,7 @@ tensorflowjs_converter --input_format keras \
                        path/to/my_model.hdf5 \
                        path/to/tfjs_target_dir
 ```
-Which is great in principle, but in practice it didn't work. There was an isue with my weights not loading into tensorflow (this turned out to be the same issue as below), but even once I got the loading to work the model initialization brought my browser to a crawl. 
+Which is great in principle, but in practice it didn't work. There was an issue with my weights not loading into tensorflow (this turned out to be the same issue as below), but even once I got the loading to work the model initialization brought my browser to a crawl. 
 
 ### There's got to be a better way!
 
