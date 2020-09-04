@@ -270,3 +270,5 @@ tried:
 - Removing the sampling (thinking it was the math libs getting corrupted)
 - Moving the final_model.bin out of parcel (thinking the .bin was being garbled)
 - In the end it seems that keras-js was breaking when parcel minimized it for the web 
+
+To be continued...
