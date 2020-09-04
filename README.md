@@ -1,5 +1,5 @@
 # scifi-nn
-Explorations in LSTM with a Sci-fi data set
+Explorations in LSTM with a Sci-fi data set using Keras
 
 For more info see [notes](notes.md)
 
